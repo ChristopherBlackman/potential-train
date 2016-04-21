@@ -52,11 +52,10 @@ public class BrowserGUI extends Application {
 		File f = new File("bookmark.bkmk");
 		if(f.isFile()){
 		OpenSettings();
-		
 		}else{
 			f.createNewFile();
-			
-		}		
+		}
+		
 		historyList = new ListView<>();
 
 		addressField = new TextField("address here");
@@ -216,15 +215,16 @@ public class BrowserGUI extends Application {
 	protected void OpenSettings()
 	{
 		try{
-			FileInputStream fis = new FileInputStream("bookmark.bkmk");
+            FileInputStream fis = new FileInputStream("bookmark.bkmk");
             ObjectInputStream ois = new ObjectInputStream(fis);
             bookmarks = (ArrayList) ois.readObject();
+            
             ois.close();
             fis.close();
-         }catch(IOException ioe){
-        	 System.out.println(ioe);
-          }
-
+			}catch(Exception l)
+			{
+				l.printStackTrace();
+			}
 	}
 	private class MyButtonClickHandler implements EventHandler<MouseEvent> {
 		@Override
