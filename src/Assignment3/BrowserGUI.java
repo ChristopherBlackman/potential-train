@@ -1,7 +1,7 @@
 package Assignment3;
 
 import javafx.application.Platform;
-
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import javafx.scene.control.Alert.AlertType;
@@ -31,11 +31,11 @@ public class BrowserGUI extends Application {
 	private String currentAddress;
 	private Button bookmarkButton;
 	private ListView<WebHistory.Entry> historyList;
-
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
-
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		MenuItem currentItem = new MenuItem("Quit");
@@ -49,7 +49,15 @@ public class BrowserGUI extends Application {
 		buttonList = new HBox();
 		forButton = new Button("Forward");
 		backButton = new Button("Back");
-
+		File f = new File("bookmarks.bkmk");
+		
+		OpenSettings();
+		
+		/*}else{
+			f.createNewFile();
+			
+		}*/
+		
 		historyList = new ListView<>();
 
 		addressField = new TextField("address here");
@@ -83,6 +91,7 @@ public class BrowserGUI extends Application {
 
 		bookmarkButton = new Button("Add Bookmark");
 		bookmarkButton.setOnMouseClicked(e -> {
+			
 			if (!bookmarks.contains(currentAddress)) {
 				bookmarks.add(currentAddress);
 				bookmarkButton.setDisable(true);
@@ -90,6 +99,15 @@ public class BrowserGUI extends Application {
 				String addressCopy = new String(currentAddress);
 				newItem.setOnAction(event ->  engine.load(addressCopy) );
 				bookmarksMenu.getItems().add(newItem);
+				try{
+			         FileOutputStream fos= new FileOutputStream("bookmark.bkmk");
+			         ObjectOutputStream oos= new ObjectOutputStream(fos);
+			         oos.writeObject(bookmarks);
+			         oos.close();
+			         fos.close();
+			       }catch(IOException ioe){
+			            ioe.printStackTrace();
+			        }
 			}
 		});
 		buttonList.getChildren().addAll(backButton, addressField, bookmarkButton, forButton);
@@ -97,7 +115,6 @@ public class BrowserGUI extends Application {
 		WebView wv = new WebView();
 
 		Menu menu1 = new Menu("File");
-		menu1.getItems().add(currentItem);
 
 		Menu helpMenu = new Menu("Help");
 
@@ -117,7 +134,7 @@ public class BrowserGUI extends Application {
 				engine.load(currentAddress);
 			}
 		});
-
+		
 		CheckMenuItem cmi = new CheckMenuItem("Show history");
 		cmi.setOnAction(e -> {
 			if (cmi.isSelected()) {
@@ -197,7 +214,19 @@ public class BrowserGUI extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
+	protected void OpenSettings()
+	{System.out.print("test1");
+		try{
+			FileInputStream fis = new FileInputStream("bookmarks.bkmk");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            
+            ois.close();
+            fis.close();
+         }catch(IOException ioe){
+        	 System.out.println(ioe);
+          }
 
+	}
 	private class MyButtonClickHandler implements EventHandler<MouseEvent> {
 		@Override
 		public void handle(MouseEvent event) {
