@@ -1,0 +1,4 @@
+ ScreenX= 132.0
+ ScreenY= 78.0
+ Height= 839.0
+ Width= 1528.0

@@ -1,9 +1,17 @@
 package Assignment3;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
 import java.io.*;
+import java.nio.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Scanner;
+
+import Assignment3.DownloadBar;
 import javafx.scene.control.Alert.AlertType;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -31,6 +39,7 @@ public class BrowserGUI extends Application {
 	private String currentAddress;
 	private Button bookmarkButton;
 	private ListView<WebHistory.Entry> historyList;
+
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -39,8 +48,7 @@ public class BrowserGUI extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		MenuItem currentItem = new MenuItem("Quit");
-		currentItem.setOnAction(event-> Platform.exit()	);
-
+		currentItem.setOnAction(event->{ saveSettings(primaryStage);Platform.exit();});
 		BorderPane root = new BorderPane();
 		bookmarks = new ArrayList<>();
 
@@ -169,7 +177,8 @@ public class BrowserGUI extends Application {
 			alert.setContentText("Eric's browser, v1.0. Feb. 18, 2016");
 			alert.show();
 		});
-
+		menu1.getItems().addAll(currentItem);
+		
 		helpMenu.getItems().addAll(javaHelp, cmi, about);
 
 		root.setTop(new VBox(menuBar, buttonList));
@@ -195,6 +204,18 @@ public class BrowserGUI extends Application {
 				forButton.setDisable(currentIndex == entryList.size() - 1);
 			}
 		});
+		engine.locationProperty().addListener(new ChangeListener<String>() {
+			@Override public void changed(ObservableValue<? extends String> observableValue, String oldLoc, String newLocation) {
+				if(newLocation.endsWith(".exe")||newLocation.endsWith(".PDF")||newLocation.endsWith(".ZIP")||
+				newLocation.endsWith(".DOC")||newLocation.endsWith(".DOCX")||newLocation.endsWith(".XLS")||newLocation.endsWith(".XLSX")
+				||newLocation.endsWith(".ISO")||newLocation.endsWith(".IMG")||newLocation.endsWith(".DMG")||newLocation.endsWith(".TAR")
+				||newLocation.endsWith(".TGZ")||newLocation.endsWith(".JAR"))
+				{
+					System.out.print("great");
+					DownloadBar newDownload = new DownloadBar(newLocation);		  
+				}
+			}
+		});	
 		historyList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		historyList.setItems(engine.getHistory().getEntries());
 		historyList.setOnMouseClicked(e -> {
@@ -210,10 +231,46 @@ public class BrowserGUI extends Application {
 		});
 
 		primaryStage.setScene(scene);
+		ReadSettings(primaryStage);
 		primaryStage.show();
 	}
+	private void ReadSettings(Stage se){
+		try {
+			String content = new Scanner(new File("Settings.txt")).useDelimiter("\\Z").next();
+			String[] parts = content.split(" ");
+			se.setX(Double.parseDouble(parts[2]));
+			se.setY(Double.parseDouble(parts[4]));
+			se.setHeight(Double.parseDouble(parts[6]));
+			se.setWidth(Double.parseDouble(parts[8]));
+		} catch (FileNotFoundException e) {
+			System.out.print("No File: error 102");
+		}
+		
+	}
+	
+	
+	protected void saveSettings(Stage primaryStage){
+		File S = new File("Settings.txt");
+		
+		try{S.createNewFile();
+		
+	        BufferedWriter writer = new BufferedWriter(new FileWriter(S));
+	            
+	                writer.write(" ScreenX= " + primaryStage.getX() + "\n");
+	                writer.write(" ScreenY= " + primaryStage.getY() + "\n");
+	                writer.write(" Height= " + primaryStage.getHeight() + "\n");
+	                writer.write(" Width= " + primaryStage.getWidth() + "\n");
+	                /*writer.write("Width =" + primaryStage.getWidt() + "\n");
+	                writer.write("Width =" + primaryStage.getWidth() + "\n");*/
+	            
+	            writer.close();
+	        } catch (IOException e) {}
+	    
+	}
+	
 	protected void OpenSettings()
-	{
+	{	
+			
 		try{
             FileInputStream fis = new FileInputStream("bookmark.bkmk");
             ObjectInputStream ois = new ObjectInputStream(fis);

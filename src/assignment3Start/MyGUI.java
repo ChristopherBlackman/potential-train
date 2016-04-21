@@ -1,6 +1,7 @@
 package assignment3Start;
 
 
+import Assignment3.DownloadBar;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
