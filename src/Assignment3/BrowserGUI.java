@@ -57,12 +57,6 @@ public class BrowserGUI extends Application {
 		buttonList = new HBox();
 		forButton = new Button("Forward");
 		backButton = new Button("Back");
-		File f = new File("bookmark.bkmk");
-		if(f.isFile()){
-		OpenSettings();
-		}else{
-			f.createNewFile();
-		}
 		
 		historyList = new ListView<>();
 
@@ -93,8 +87,9 @@ public class BrowserGUI extends Application {
 		backButton.setDisable(true);
 		forButton.setDisable(true);
 		
-		Menu bookmarksMenu = new Menu("Bookmarks");
-
+		
+		Menu bookmarksMenu = new Menu("Bookmarks");//InitializeBookmarks();//new Menu("Bookmarks");
+		InitializeBookmarks(bookmarksMenu);
 		bookmarkButton = new Button("Add Bookmark");
 		bookmarkButton.setOnMouseClicked(e -> {
 			
@@ -102,8 +97,8 @@ public class BrowserGUI extends Application {
 				bookmarks.add(currentAddress);
 				bookmarkButton.setDisable(true);
 				MenuItem newItem = new MenuItem(currentAddress);
-				String addressCopy = new String(currentAddress);
-				newItem.setOnAction(event ->  engine.load(addressCopy) );
+				String addressCopy = new String(currentAddress); 
+				newItem.setOnAction(event ->  engine.load(addressCopy));
 				bookmarksMenu.getItems().add(newItem);
 				try{
 			         FileOutputStream fos= new FileOutputStream("bookmark.bkmk");
@@ -234,6 +229,7 @@ public class BrowserGUI extends Application {
 		ReadSettings(primaryStage);
 		primaryStage.show();
 	}
+
 	private void ReadSettings(Stage se){
 		try {
 			String content = new Scanner(new File("Settings.txt")).useDelimiter("\\Z").next();
@@ -268,20 +264,37 @@ public class BrowserGUI extends Application {
 	    
 	}
 	
-	protected void OpenSettings()
-	{	
-			
+		
+	protected void InitializeBookmarks(Menu bookmarksMenu){
+		/*
+		 * creates a new file if there does not exist one
+		 */
+		
+		/*
+		 * get the information inside of the file
+		 */
+
 		try{
             FileInputStream fis = new FileInputStream("bookmark.bkmk");
             ObjectInputStream ois = new ObjectInputStream(fis);
-            bookmarks = (ArrayList) ois.readObject();
+            bookmarks = (ArrayList)ois.readObject();
             
             ois.close();
             fis.close();
-			}catch(Exception l)
-			{
-				l.printStackTrace();
-			}
+		}catch(Exception l){
+			System.out.println("No Object in File: ERROR:101");	
+			//l.printStackTrace();
+		}
+		
+		/*
+		 * loops through the bookmarks and adds them to the menu
+		 */
+		for(int i = 0; i < bookmarks.size(); i++){
+			MenuItem newItem = new MenuItem(bookmarks.get(i));
+			String addressCopy = new String(bookmarks.get(i));
+			newItem.setOnAction(event ->  engine.load(addressCopy));
+			bookmarksMenu.getItems().add(newItem);
+		}
 	}
 	private class MyButtonClickHandler implements EventHandler<MouseEvent> {
 		@Override
