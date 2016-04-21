@@ -49,15 +49,14 @@ public class BrowserGUI extends Application {
 		buttonList = new HBox();
 		forButton = new Button("Forward");
 		backButton = new Button("Back");
-		File f = new File("bookmarks.bkmk");
-		
+		File f = new File("bookmark.bkmk");
+		if(f.isFile()){
 		OpenSettings();
 		
-		/*}else{
+		}else{
 			f.createNewFile();
 			
-		}*/
-		
+		}		
 		historyList = new ListView<>();
 
 		addressField = new TextField("address here");
@@ -215,11 +214,11 @@ public class BrowserGUI extends Application {
 		primaryStage.show();
 	}
 	protected void OpenSettings()
-	{System.out.print("test1");
+	{
 		try{
-			FileInputStream fis = new FileInputStream("bookmarks.bkmk");
+			FileInputStream fis = new FileInputStream("bookmark.bkmk");
             ObjectInputStream ois = new ObjectInputStream(fis);
-            
+            bookmarks = (ArrayList) ois.readObject();
             ois.close();
             fis.close();
          }catch(IOException ioe){
